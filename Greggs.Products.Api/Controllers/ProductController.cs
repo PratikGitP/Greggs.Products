@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Greggs.Products.Api.DataAccess;
 using Greggs.Products.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -37,4 +38,42 @@ public class ProductController : ControllerBase
             })
             .ToArray();
     }
-}
+
+
+    [HttpGet("{pageStart}/{pageSize}")]
+    public IEnumerable<Product> GetFanaticProducts(int pageStart = 1, int pageSize = 10)
+    {
+        IDataAccess<Product> products = new ProductAccess();
+
+        var proudctList = products.List(pageStart, pageSize);
+
+        var rtnValue = Enumerable.Empty<Product>();
+
+        if (proudctList.Any())
+        {
+            rtnValue = proudctList;
+        }
+
+        return rtnValue;
+    }
+
+    [HttpGet("{pageStart}/{pageSize}/{exchangeRate}")]
+    public IEnumerable<Product> GetEntrepreneurProduts(int pageStart = 1, int pageSize = 10, decimal exchangeRate = 1)
+    {
+        IDataAccess<Product> products = new ProductAccess();
+
+        var proudctList = products.List(pageStart, pageSize);
+
+        var rtnValue = Enumerable.Empty<Product>();
+
+        if (proudctList.Any())                 
+        {
+            rtnValue = proudctList.Select(x => new Product {   
+                Name = x.Name,
+                PriceInPounds = x.PriceInPounds * exchangeRate
+            }).ToList();
+        }
+
+        return rtnValue;
+
+    }
